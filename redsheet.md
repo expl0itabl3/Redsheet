@@ -1,4 +1,4 @@
-﻿## PowerShell
+## PowerShell
 
 * 32-bit PowerShell
    * `C:\Windows\SysWOW64\WindowsPowerShell\v1.0\powershell.exe`
@@ -333,7 +333,7 @@
 
 ## Resource-Based Constrained Delegation Abuse (RBCD)
 
-*  # Create new machine account (with PowerMad)
+* Create new machine account (with PowerMad)
    * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<password>' -AsPlainText -Force)`
    * Option 2 - `SharpMad: Sharpmad.exe MAQ -Action new -MachineAccount <computername> -MachinePassword <password>`
 * Create SecurityDescriptor
