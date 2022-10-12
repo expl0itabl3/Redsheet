@@ -901,6 +901,18 @@ The KrbRelayUp tool uses this service ticket to authenticate to the local Servic
    * `C:\Users\<user>\AppData\Local\Microsoft\Teams\current\AUDIOSES.DLL`
 
 
+## Domain Persistence
+
+* Golden Ticket
+  * If you have compromised the krbtgt account, you can create a Golden Ticket. This is basically a TGT containing a PAC which states that the user belongs to privileged groups. This PAC is signed with the krbtgt key and embedded in a forged TGT. With this TGT, Service Tickets can then be requested for any resource in the domain.
+* Silver Ticket
+  * If you have compromised a service account, you can create a Silver Ticket. This is basically a TGS containing a PAC with arbitraty information about the requesting user. This gives unrestricted access to the respective service. Since a Silver Ticket is a forged TGS, there is no communication with a Domain Controller. In theory this is a more stealthy approach. However, note that both type of tickets contain a forged PAC, which could be detected. Diamond Tickets offer a solution for this.
+* Diamond Ticket
+  * If you have compromised the krbtgt account, you can create a Diamond Ticket. A normal ticket is requested, in which the PAC is decrypted, modified and re-encrypted. This results in a legitimate TGT, containing a forged PAC which states that the user belongs to privileged groups. It is mentioned that the current implementation (Impacket - ticketer.py) this is not really well worked out. The Sapphire ticket approach is therefore recommended.
+* Sapphire Ticket
+  * Sapphire Tickets are similar to Diamond tickets, as a ticket is not forged, but a legitimate ticket is requested and modified. However, instead of adding privileged groups to the PAC, a legitimate privileged user PAC is gained by S4U tricks. This legitimate PAC is then embedded in the legitimate TGT. This makes it very difficult to detect effectively. To perform this last attack, you need to use this pull request:: https://github.com/SecureAuthCorp/impacket/pull/1411/files.
+
+
 ## Loot
 
 * Chrome
