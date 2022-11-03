@@ -855,33 +855,6 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `aquatone-discover -d <domain>`
    * `aquatone-takeover -d <domain>`
 
-
-## KrbRelayUp
-
-* Relay - first phase of the attack. Will Coerce Kerberos auth from local machine account, relay it to LDAP and create a control primitive over the local machine using RBCD or SHADOWCRED.
-   * `KrbRelayUp.exe relay -d <fqdn> -c`
-* Spawn - second phase of the attack. Will use the appropriate control primitive to obtain a Kerberos Service Ticket and will use it to create a new service running as SYSTEM.
-   * `KrbRelayUp.exe spawn -d <fqdn> -cn KRBRELAYUP$ -cp <pass>`
-* Note that this will spawn a cmd.exe (as Administrator) by default. With the -sc parameter you can specify a command yourself.
-   * `KrbRelayUp.exe spawn -d <fqdn> -cn KRBRELAYUP$ -cp <pass> -sc "net localgroup Administrators <user> /add"`
-* Manual
-   * RBCD method: https://gist.github.com/tothi/bf6c59d6de5d0c9710f23dae5750c4b9
-   * Shadow Credentials method: https://icyguider.github.io/2022/05/19/NoFix-LPE-Using-KrbRelay-With-Shadow-Credentials.html
-
-
-Technical explanation
-You are an unprivileged user in the domain on computer Y. And you're eager to escalate your privileges. As a user you can create arbitrary COM objects. There are some COM objects that are special in that they are not initiated in your current session, but you can initiate them as another user. For example, it is possible to create a COM object that will run as local system. We can perform a trick here.
-
-
-COM has this concept called "marshaling". This is more or less similar to Java or .NET Serialization - the conversion of the state of an object into a byte stream that can be transported. The first trick you do is create a martialled object from a COM object which will be started as local system. The COM object also contains information called OXID, a kind of DNS resolution for RPC. What you can do here is put in that serialized COM object your own OXID string that will point to any RPC interface. When deserialization occurs, it tries to create the object based on this string; in this case as local system. Local system will then try to connect to an RPC interface of our choice. So on this RPC interface is authenticated by local system. All this takes place (mostly) locally on the system.
-
-
-The original KrbRelay performs the above to connect to a local interface and force authentication. That authentication can then be relayed. The authentication can be NTLM (a standard NTLM relay attack that you are already familiar with), or Kerberos. The most logical next step is to relay this authentication to a Domain Controllers LDAP. For this to work, LDAP signing and LDAP channel binding on the DC should not be required (default). Via this relay you can configure RBCD, by populating the "msDS-AllowedToActOnBehalfOfOtherIdentity" attribute on machine Y. For this to work, you create a new machine account: machine Z. Because, for delegation you need to specify an account with an SPN. You can then request a service ticket for example as Administrator on machine Y through S4U.
-
-
-The KrbRelayUp tool uses this service ticket to authenticate to the local Service Manager and create a new service as NT AUTHORITY\System (i.e. spawn cmd.exe). It is also possible to trigger the relay with a session of, for example, a logged in admin. And relay these to for example SMB (if signing is not enabled).
-
-
 ## Ldapsearch
 
 * Get all users with an SPN set for Kerberoasting
