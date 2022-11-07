@@ -908,6 +908,19 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `dir \\<domain>\SYSVOL`
 
 
+## MDE
+* Check for MDE existence:
+  * Running process: Task Manager > Details > MsSense.exe
+  * Running service: Task Manager > Services > Sense
+  * Registry key: req query "HKLM\SOFTWARE\Policies\Microsoft\Windows Advanced Threat Protection"
+  * File path: dir "C:\Program Files\Windows Defender Advanced Threat Protection"
+
+* Processes explained:
+  * MsMpEng.exe: Windows Antimalware Service Executable that enables Windows Defender to continuously monitor the computer for potential threats.
+  * SenseNdr.exe: Microsoft Defender for Endpoint process in charge of passive network data collection.
+  * MsSense.exe: Main Microsoft Defender for Endpoint process.
+
+
 ## Miscellaneous
 
 * DPAT
