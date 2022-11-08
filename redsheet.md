@@ -688,11 +688,11 @@ Get-SQLQuery -Query "SELECT * FROM OPENQUERY(`"<remote_instance>`", 'select @@se
 * Remove machine accounts
    * `grep -F -v '$' dump.ntds.full > dump.ntds`
 * Cracking
-   * `hashcat.bin -m 1000 dump.ntds mystery-list.txt -r OneRuleToRuleThemAll.rule`
+   * `hashcat -m 1000 dump.ntds mystery-list.txt -r OneRuleToRuleThemAll.rule`
 * LM incremental
-   * `hashcat.bin -m 3000 dump.ntds -a 3 '?1?1?1?1?1?1?1' --increment -1 '?l?d?u'`
+   * `hashcat -m 3000 dump.ntds -a 3 '?a?a?a?a?a?a?a' -i`
 * NTLM incremental
-   * `hashcat.bin -m 1000 dump.ntds -a 3 '?1?1?1?1?1?1?1?1' --increment -1 '?l?d?u'`
+   * `hashcat -m 1000 dump.ntds -a 3 '?a?a?a?a?a?a?a?a' -i`
 
 
 ## Load C# assembly reflectively
