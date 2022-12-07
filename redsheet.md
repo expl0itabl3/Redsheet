@@ -139,7 +139,7 @@
    * CrackMapExec
       * `crackmapexec smb <ip> -d <domain> -u <user> -p <pass> --pass-pol`
 * Kerbrute
-   * `kerbrute passwordspray -d <domain> users.txt <password>`
+   * `kerbrute passwordspray -d <domain> users.txt <password> [--dc <ip>]`
    * Don't forget to try: `--user-as-pass`
 * PowerShell
    * `Invoke-DomainPasswordSpray -Password <password> -Force -OutFile spray.txt`
