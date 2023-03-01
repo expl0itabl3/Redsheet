@@ -454,6 +454,17 @@
    * `.\psexec.exe -accepteula -sid taskmgr.exe`
 
 
+## Kerberos on Linux
+* Install Kerberos client utilities
+   * `sudo apt install krb5-user`
+* Set the ticket for impacket use
+   * `export KRB5CCNAME=/tmp/ticket.ccache`
+* Example: Get AD Users
+   * `proxychains GetADUsers.py -all -k -no-pass -dc-ip <dc-ip> <domain>/<user>`
+      * -no-pass = Don't ask for password (useful for -k)
+      * -k = Use Kerberos authentication.
+
+
 ## Responder
 
 * [Responder](https://github.com/lgandx/Responder)
