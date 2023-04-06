@@ -966,6 +966,23 @@ $assem = [System.Reflection.Assembly]::Load($data)
   * MsSense.exe: Main Microsoft Defender for Endpoint process.
 
 
+## NTLMv1 downgrade
+* Check for Compatibility Level:
+  * LmCompatibilityLevel = 0x1: Send LM & NTLM
+  * `reg query HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v lmcompatibilitylevel`
+  * Or use the CrackMapExec module: ntlmv1
+* Attack 1: Authentication Downgrade
+  * Configure Responder to set a static challenge downgrade the authentication (1122334455667788)
+  * Coerce authentication from the DC
+  * Crack the incoming hash
+  * DCSync
+* Attack 2: LDAP Relay
+  * Set up ntlmrelayx.py to strip the MIC while also performing a RBCD attack
+  * Coerce authentication fom the DC
+  * Craft a service ticket for an impersonated user (DA)
+  * DCsync
+
+
 ## Miscellaneous
 
 * DPAT
