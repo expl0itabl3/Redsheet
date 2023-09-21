@@ -164,7 +164,7 @@
 * BOF
    * `sharphoundbof --CollectionMethod All --ExcludeDomainControllers --NoSaveCache`
 * Python
-   * `proxychains bloodhound-python -c all -u <user> -p <pass> -d <domain> -ns <nameserver> --dns-timeout 30 --dns-tcp`
+   * `proxychains bloodhound-python -c all -u <user> -p '<pass>' -d <domain> -dc <dc> -ns <ns> --dns-timeout 30 --dns-tcp`
 * BOFHound
    * First gather data with ldapsearch: `ldapsearch (objectclass=*)`
    * `python3 -m pip install bofhound`
